@@ -160,6 +160,7 @@ int main(int argc, char *argv[]) {
             }
         } else {
             /* No data??? */
+            printf("NO DATA!\n");
         }
         p++;
     }
