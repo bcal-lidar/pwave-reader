@@ -160,8 +160,12 @@ int main(int argc, char *argv[]) {
                     fprintf(wout, "%lld ", p);
                     for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
                         fi = 0;
-                        for(k = 0; k < sampling->get_number_of_samples(); k++) {
-                            fprintf(wout, "%u ", sampling->get_sample(k));
+                        for(k = 0; k < maxCount; k++) {
+                            if(k >= sampling->get_number_of_samples()) {
+                                fprintf(wout, "%u ", 0);
+                            } else {
+                                fprintf(wout, "%u ", sampling->get_sample(k));
+                            }
                         }
                     }
                     fprintf(wout, "\n");
