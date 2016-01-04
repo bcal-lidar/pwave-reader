@@ -10,6 +10,8 @@
 
 #include "pulsereader.hpp"
 
+#define MAX(a, b) (a)>(b)?(a):(b)
+
 /*
 ** This program opens and reads a pulse waves file, and outputs pertinent
 ** information for each in/out waveform.  The output should be consumable by
@@ -94,6 +96,30 @@ int main(int argc, char *argv[]) {
     long long p = 0;
     int rc = 0;
     int fi = 0;
+    int maxCount = 0;
+    /*
+    ** Scan the files for the longest pulse, we may need to pad some records
+    ** with zeroes.
+    */
+    printf("Scanning pulses to attain max pulse length\n");
+    while(pReader->read_pulse())
+    {
+        if(pReader->read_waves()) {
+            for(i = 0; i < pReader->waves->get_number_of_samplings(); i++) {
+                sampling = pReader->waves->get_sampling(i);
+                if(sampling->get_type() == PULSEWAVES_OUTGOING) {
+                    continue;
+                }
+                for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
+                    if(maxCount < sampling->get_number_of_samples()) {
+                        maxCount = sampling->get_number_of_samples();
+                    }
+                }
+            }
+        }
+    }
+    printf("Using max count of %d for sample length\n", maxCount);
+    pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
         gpsTime = pReader->pulse.T * pReader->header.t_scale_factor + pReader->header.t_offset;
@@ -134,7 +160,6 @@ int main(int argc, char *argv[]) {
                     fprintf(wout, "%lld ", p);
                     for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
                         fi = 0;
-                        fprintf(wout, "%lld ", p);
                         for(k = 0; k < sampling->get_number_of_samples(); k++) {
                             fprintf(wout, "%u ", sampling->get_sample(k));
                         }
@@ -151,8 +176,12 @@ int main(int argc, char *argv[]) {
                                    j, szWaveIn);
                         }
                         fprintf(wins[j], "%lld ", p);
-                        for(k = 0; k < sampling->get_number_of_samples(); k++) {
-                            fprintf(wins[j], "%u ", sampling->get_sample(k));
+                        for(k = 0; k < maxCount; k++) {
+                            if(k >= sampling->get_number_of_samples()) {
+                                fprintf(wins[j], "%u ", 0);
+                            } else {
+                                fprintf(wins[j], "%u ", sampling->get_sample(k));
+                            }
                         }
                         fprintf(wins[j], "\n");
                     }
