@@ -32,4 +32,5 @@ include_directories(${PULSEWAVES_INC})
 
 add_executable(pw pw.cpp)
 target_link_libraries(pw ${PULSEWAVES_LIB})
+install(TARGETS pw DESTINATION bin)
 

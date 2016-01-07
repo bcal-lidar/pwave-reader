@@ -35,3 +35,27 @@ find_path(PULSEWAVES_INC inc NO_DEFAULT_PATH)
 
 add_subdirectory(src)
 
+include(InstallRequiredSystemLibraries)
+
+# *****************************************************************************
+# CPack variables
+# *****************************************************************************
+if(WIN32)
+    set(CPACK_NSIS_PACKAGE_NAME pwaves-reader)
+    set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
+
+    set(CPACK_NSIS_INSTALL_ROOT "C:")
+    cmake_policy(PUSH)
+    cmake_policy(SET CMP0010 OLD)
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "pwaves-reader")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "pwaves-reader")
+    cmake_policy(POP)
+    set(CPACK_NSIS_DISPLAY_NAME "pwaves-reader")
+
+    set(CPACK_NSIS_MODIFY_PATH ${RI_NAME})
+
+    set(CPACK_PACKAGE_EXECUTABLES "pwaves" "pwaves")
+
+endif(WIN32)
+Include(CPack)
+
