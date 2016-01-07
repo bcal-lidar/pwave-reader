@@ -97,6 +97,9 @@ int main(int argc, char *argv[]) {
     int rc = 0;
     int fi = 0;
     int maxCount = 0;
+    int totalPoints = 0;
+    int returnCount = 0;
+    double progress = 0.;
     /*
     ** Scan the files for the longest pulse, we may need to pad some records
     ** with zeroes.
@@ -104,6 +107,7 @@ int main(int argc, char *argv[]) {
     printf("Scanning pulses to attain max pulse length\n");
     while(pReader->read_pulse())
     {
+        totalPoints++;
         if(pReader->read_waves()) {
             for(i = 0; i < pReader->waves->get_number_of_samplings(); i++) {
                 sampling = pReader->waves->get_sampling(i);
@@ -119,6 +123,8 @@ int main(int argc, char *argv[]) {
         }
     }
     printf("Using max count of %d for sample length\n", maxCount);
+    printf("Total Points: %d\n", totalPoints);
+    printf("Reported pulse count: %lld\n", pReader->p_count);
     pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
@@ -142,7 +148,6 @@ int main(int argc, char *argv[]) {
         edge = pReader->pulse.edge_of_scan_line;
         scan_dir = pReader->pulse.scan_direction;
         intensity = pReader->pulse.intensity;
-
         rc = fprintf(pout, szPulseFormat, p,
                                           gpsTime,
                                           xa, ya, za,
@@ -154,7 +159,8 @@ int main(int argc, char *argv[]) {
                                           intensity);
 
         if(pReader->read_waves()) {
-            for(i = 0; i < pReader->waves->get_number_of_samplings(); i++) {
+            returnCount = 0;
+            for(i = 0; i < pReader->waves->get_number_of_samplings() && returnCount < 1; i++) {
                 sampling = pReader->waves->get_sampling(i);
                 if(sampling->get_type() == PULSEWAVES_OUTGOING) {
                     fprintf(wout, "%lld ", p);
@@ -169,15 +175,13 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     fprintf(wout, "\n");
-                } else { /* PULSEWAVES_INCOMING */
+                } else if(sampling->get_type() == PULSEWAVES_RETURNING) {
                     for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
                         /* Need new file? */
                         if(j >= nwins) {
                             wins = (FILE**)realloc(wins, sizeof(FILE*) * ++nwins);
                             sprintf(szWaveIn, "%s_WAVE_IN_%d.txt", szBase, nwins-1);
                             wins[j] = fopen(szWaveIn, "w");
-                            printf("Creating new incoming wave file for %d: %s\n",
-                                   j, szWaveIn);
                         }
                         fprintf(wins[j], "%lld ", p);
                         for(k = 0; k < maxCount; k++) {
@@ -188,7 +192,10 @@ int main(int argc, char *argv[]) {
                             }
                         }
                         fprintf(wins[j], "\n");
+                        returnCount++;
                     }
+                } else {
+                    printf("Unknown type: %d\n", sampling->get_type());
                 }
             }
         } else {
@@ -196,7 +203,12 @@ int main(int argc, char *argv[]) {
             printf("NO DATA!\n");
         }
         p++;
+        if(p % 1000 == 0) {
+            progress = ((double)p / (double)totalPoints) * 100.;
+            printf("\r%d%% done...", (int)progress);
+        }
     }
+    printf("\r100%% done.\n");
 
     free(szPulseOut);
     free(szWaveIn);
@@ -210,6 +222,8 @@ int main(int argc, char *argv[]) {
         fclose(wins[i]);
     }
     free(wins);
+    printf("Created %d incoming wave files\n", nwins);
+    printf("Total points processed: %lld\n", p);
 
     return 0;
 }
