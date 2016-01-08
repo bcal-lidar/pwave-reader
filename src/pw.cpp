@@ -130,11 +130,11 @@ int main(int argc, char *argv[]) {
         /* Write line to pulse file */
         gpsTime = pReader->pulse.T * pReader->header.t_scale_factor + pReader->header.t_offset;
         xa = pReader->pulse.anchor_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        ya = pReader->pulse.anchor_X * pReader->header.y_scale_factor + pReader->header.y_offset;
-        za = pReader->pulse.anchor_X * pReader->header.z_scale_factor + pReader->header.z_offset;
+        ya = pReader->pulse.anchor_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
+        za = pReader->pulse.anchor_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
         xt = pReader->pulse.target_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        yt = pReader->pulse.target_X * pReader->header.y_scale_factor + pReader->header.y_offset;
-        zt = pReader->pulse.target_X * pReader->header.z_scale_factor + pReader->header.z_offset;
+        yt = pReader->pulse.target_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
+        zt = pReader->pulse.target_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
         dx = (xt - xa) / 1000;
         dy = (yt - ya) / 1000;
         dz = (zt - za) / 1000;
