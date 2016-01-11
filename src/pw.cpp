@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     /* Scanner metadata */
     PULSEscanner scanner;
-    sprintf(szScanOut, "%s_SCANNER.txt", szBase);
+    sprintf(szScanOut, "%s_SCANNER.csv", szBase);
     scanout = fopen(szScanOut, "w");
     fprintf(scanout,
             "scanner_id,wave_length,outgoing_pulse_width,scan_pattern,"
