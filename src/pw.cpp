@@ -28,11 +28,12 @@ int main(int argc, char *argv[]) {
     PULSEreader *pReader;
     WAVESsampling *sampling;
     int i, j, k;
-    char *szPulseOut, *szWaveOut, *szWaveIn, *szBase;
+    char *szPulseOut, *szWaveOut, *szWaveIn, *szBase, *szScanOut;
     FILE *pout;
     FILE *wout;
     FILE **wins;
     int nwins = 1;
+    FILE *scanout;
 
     /* start with one incoming file */
     wins = (FILE**)malloc(sizeof(FILE*) * nwins);
@@ -52,10 +53,35 @@ int main(int argc, char *argv[]) {
     szPulseOut = (char*)calloc(8192, 1);
     szWaveIn = (char*)calloc(8192, 1);
     szWaveOut = (char*)calloc(8192, 1);
+    szScanOut = (char*)calloc(8192, 1);
     szBase = argv[2];
     sprintf(szPulseOut, "%s_PULSE.csv", szBase);
     sprintf(szWaveIn, "%s_WAVE_IN.txt", szBase);
     sprintf(szWaveOut, "%s_WAVE_OUT.txt", szBase);
+
+    /* Scanner metadata */
+    PULSEscanner scanner;
+    sprintf(szScanOut, "%s_SCANNER.txt", szBase);
+    scanout = fopen(szScanOut, "w");
+    fprintf(scanout,
+            "scanner_id,wave_length,outgoing_pulse_width,scan_pattern,"
+            "number_of_mirror_facets,scan_frequency,scan_angle_min,"
+            "scan_angle_max,pulse_frequency,beam_diameter_at_exit_aperture,"
+            "beam_divergence,minimal_range,maximal_range\n");
+
+    i = 1;
+    while(pReader->header.get_scanner(&scanner, i)) {
+        fprintf(scanout, "%d,%lf,%lf,%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%s\n",
+                i, scanner.wave_length, scanner.outgoing_pulse_width,
+                scanner.scan_pattern, scanner.number_of_mirror_facets,
+                scanner.scan_frequency, scanner.scan_angle_min,
+                scanner.scan_angle_max, scanner.pulse_frequency,
+                scanner.beam_diameter_at_exit_aperture, scanner.beam_divergence,
+                scanner.minimal_range, scanner.maximal_range,
+                scanner.description);
+        i++;
+    }
+    fclose(scanout);
 
     pout = fopen(szPulseOut, "w");
     fprintf(pout, "id,");
@@ -213,6 +239,7 @@ int main(int argc, char *argv[]) {
     free(szPulseOut);
     free(szWaveIn);
     free(szWaveOut);
+    free(szScanOut);
     pReader->close();
     delete pReader;
 
