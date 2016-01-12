@@ -156,15 +156,18 @@ int main(int argc, char *argv[]) {
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
         gpsTime = pReader->pulse.get_T();
+        pReader->pulse.compute_anchor_and_target_and_dir();
         xa = pReader->pulse.compute_and_get_anchor_x();
         ya = pReader->pulse.compute_and_get_anchor_y();
         za = pReader->pulse.compute_and_get_anchor_z();
         xt = pReader->pulse.compute_and_get_target_x();
         yt = pReader->pulse.compute_and_get_target_y();
         zt = pReader->pulse.compute_and_get_target_z();
+        pReader->pulse.compute_first();
         xf = pReader->pulse.compute_and_get_first_x();
         yf = pReader->pulse.compute_and_get_first_y();
         zf = pReader->pulse.compute_and_get_first_z();
+        pReader->pulse.compute_last();
         xl = pReader->pulse.compute_and_get_last_x();
         yl = pReader->pulse.compute_and_get_last_y();
         zl = pReader->pulse.compute_and_get_last_z();
