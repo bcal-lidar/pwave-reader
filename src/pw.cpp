@@ -90,12 +90,16 @@ int main(int argc, char *argv[]) {
     fprintf(pout, "target_x,target_y,target_z,");
     fprintf(pout, "first_return_x,first_return_y,first_return_z,");
     fprintf(pout, "last_return_x,last_return_y,last_return_z,");
+    fprintf(pout, "raw_first_return_x,raw_first_return_y,raw_first_return_z,");
+    fprintf(pout, "raw_last_return_x,raw_first_return_y,raw_first_return_z,");
     fprintf(pout, "edge,scan_dir,"); /* bit, written as uint8 */
     fprintf(pout, "facet,"); /* 2 bit, written as uint8 */
     fprintf(pout, "intensity\n"); /* uint8 */
 
     const char szPulseFormat[] = "%lld," \
                                  "%lf," \
+                                 "%lf,%lf,%lf," \
+                                 "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
@@ -116,6 +120,8 @@ int main(int argc, char *argv[]) {
     double dx, dy, dz;
     double xf, yf, zf;
     double xl, yl, zl;
+    double rxf, ryf, rzf;
+    double rxl, ryl, rzl;
     unsigned char edge;
     unsigned char scan_dir;
     unsigned char intensity;
@@ -170,6 +176,12 @@ int main(int argc, char *argv[]) {
         xl = xa + pReader->pulse.last_returning_sample * dx;
         yl = ya + pReader->pulse.last_returning_sample * dy;
         zl = za + pReader->pulse.last_returning_sample * dz;
+        rxf = pReader->pulse.first_returning_sample;
+        ryf = pReader->pulse.first_returning_sample;
+        rzf = pReader->pulse.first_returning_sample;
+        rxl = pReader->pulse.last_returning_sample;
+        ryl = pReader->pulse.last_returning_sample;
+        rzl = pReader->pulse.last_returning_sample;
 
         edge = pReader->pulse.edge_of_scan_line;
         scan_dir = pReader->pulse.scan_direction;
@@ -180,6 +192,8 @@ int main(int argc, char *argv[]) {
                                           xt, yt, zt,
                                           xf, yf, zf,
                                           xl, yl, zl,
+                                          rxf, ryf, rzf,
+                                          rxl, ryl, rzl,
                                           edge, scan_dir,
                                           pReader->pulse.mirror_facet,
                                           intensity);
