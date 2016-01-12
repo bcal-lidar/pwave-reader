@@ -101,8 +101,7 @@ int main(int argc, char *argv[]) {
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
-                                 "%lf,%lf,%lf," \
-                                 "%lf,%lf,%lf," \
+                                 "%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%d,%d," \
                                  "%d," \
@@ -120,8 +119,7 @@ int main(int argc, char *argv[]) {
     double dx, dy, dz;
     double xf, yf, zf;
     double xl, yl, zl;
-    double rxf, ryf, rzf;
-    double rxl, ryl, rzl;
+    double rf, rl;
     unsigned char edge;
     unsigned char scan_dir;
     unsigned char intensity;
@@ -176,12 +174,8 @@ int main(int argc, char *argv[]) {
         xl = xa + pReader->pulse.last_returning_sample * dx;
         yl = ya + pReader->pulse.last_returning_sample * dy;
         zl = za + pReader->pulse.last_returning_sample * dz;
-        rxf = pReader->pulse.first_returning_sample;
-        ryf = pReader->pulse.first_returning_sample;
-        rzf = pReader->pulse.first_returning_sample;
-        rxl = pReader->pulse.last_returning_sample;
-        ryl = pReader->pulse.last_returning_sample;
-        rzl = pReader->pulse.last_returning_sample;
+        rf = pReader->pulse.first_returning_sample;
+        rl = pReader->pulse.last_returning_sample;
 
         edge = pReader->pulse.edge_of_scan_line;
         scan_dir = pReader->pulse.scan_direction;
@@ -192,8 +186,7 @@ int main(int argc, char *argv[]) {
                                           xt, yt, zt,
                                           xf, yf, zf,
                                           xl, yl, zl,
-                                          rxf, ryf, rzf,
-                                          rxl, ryl, rzl,
+                                          rf, rl,
                                           edge, scan_dir,
                                           pReader->pulse.mirror_facet,
                                           intensity);
