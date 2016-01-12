@@ -90,7 +90,6 @@ int main(int argc, char *argv[]) {
     fprintf(pout, "target_x,target_y,target_z,");
     fprintf(pout, "first_return_x,first_return_y,first_return_z,");
     fprintf(pout, "last_return_x,last_return_y,last_return_z,");
-    fprintf(pout, "raw_first_return,raw_last_return,");
     fprintf(pout, "edge,scan_dir,"); /* bit, written as uint8 */
     fprintf(pout, "facet,"); /* 2 bit, written as uint8 */
     fprintf(pout, "intensity\n"); /* uint8 */
@@ -100,7 +99,6 @@ int main(int argc, char *argv[]) {
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
-                                 "%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%d,%d," \
                                  "%d," \
@@ -118,9 +116,6 @@ int main(int argc, char *argv[]) {
     double dx, dy, dz;
     double xf, yf, zf;
     double xl, yl, zl;
-    double toff, xoff, yoff, zoff;
-    double tscale, xscale, yscale, zscale;
-    double rf, rl;
     unsigned char edge;
     unsigned char scan_dir;
     unsigned char intensity;
@@ -157,38 +152,22 @@ int main(int argc, char *argv[]) {
     printf("Total Points: %d\n", totalPoints);
     printf("Reported pulse count: %lld\n", pReader->p_count);
 
-    /* Scale and Offsets */
-    toff = pReader->header.t_offset;
-    xoff = pReader->header.x_offset;
-    yoff = pReader->header.y_offset;
-    zoff = pReader->header.z_offset;
-
-    tscale = pReader->header.t_scale_factor;
-    xscale = pReader->header.x_scale_factor;
-    yscale = pReader->header.y_scale_factor;
-    zscale = pReader->header.z_scale_factor;
-
     pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
-        gpsTime = (pReader->pulse.T * tscale) + toff;
-        xa = (pReader->pulse.anchor_X * xscale) + xoff;
-        ya = (pReader->pulse.anchor_Y * yscale) + yoff;
-        za = (pReader->pulse.anchor_Z * zscale) + zoff;
-        xt = (pReader->pulse.target_X * xscale) + xoff;
-        yt = (pReader->pulse.target_Y * yscale) + yoff;
-        zt = (pReader->pulse.target_Z * zscale) + zoff;
-        dx = (xt - xa) / 1000.0;
-        dy = (yt - ya) / 1000.0;
-        dz = (zt - za) / 1000.0;
-        xf = xa + pReader->pulse.first_returning_sample * dx;
-        yf = ya + pReader->pulse.first_returning_sample * dy;
-        zf = za + pReader->pulse.first_returning_sample * dz;
-        xl = xa + pReader->pulse.last_returning_sample * dx;
-        yl = ya + pReader->pulse.last_returning_sample * dy;
-        zl = za + pReader->pulse.last_returning_sample * dz;
-        rf = pReader->pulse.first_returning_sample;
-        rl = pReader->pulse.last_returning_sample;
+        gpsTime = pReader->pulse.get_T();
+        xa = pReader->pulse.compute_and_get_anchor_x();
+        ya = pReader->pulse.compute_and_get_anchor_y();
+        za = pReader->pulse.compute_and_get_anchor_z();
+        xt = pReader->pulse.compute_and_get_target_x();
+        yt = pReader->pulse.compute_and_get_target_y();
+        zt = pReader->pulse.compute_and_get_target_z();
+        xf = pReader->pulse.compute_and_get_first_x();
+        yf = pReader->pulse.compute_and_get_first_y();
+        zf = pReader->pulse.compute_and_get_first_z();
+        xl = pReader->pulse.compute_and_get_last_x();
+        yl = pReader->pulse.compute_and_get_last_y();
+        zl = pReader->pulse.compute_and_get_last_z();
 
         edge = pReader->pulse.edge_of_scan_line;
         scan_dir = pReader->pulse.scan_direction;
@@ -199,7 +178,6 @@ int main(int argc, char *argv[]) {
                                           xt, yt, zt,
                                           xf, yf, zf,
                                           xl, yl, zl,
-                                          rf, rl,
                                           edge, scan_dir,
                                           pReader->pulse.mirror_facet,
                                           intensity);
