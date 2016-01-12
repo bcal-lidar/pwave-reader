@@ -90,8 +90,7 @@ int main(int argc, char *argv[]) {
     fprintf(pout, "target_x,target_y,target_z,");
     fprintf(pout, "first_return_x,first_return_y,first_return_z,");
     fprintf(pout, "last_return_x,last_return_y,last_return_z,");
-    fprintf(pout, "raw_first_return_x,raw_first_return_y,raw_first_return_z,");
-    fprintf(pout, "raw_last_return_x,raw_first_return_y,raw_first_return_z,");
+    fprintf(pout, "raw_first_return,raw_last_return,");
     fprintf(pout, "edge,scan_dir,"); /* bit, written as uint8 */
     fprintf(pout, "facet,"); /* 2 bit, written as uint8 */
     fprintf(pout, "intensity\n"); /* uint8 */
