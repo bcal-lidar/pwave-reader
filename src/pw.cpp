@@ -4,6 +4,7 @@
 ** Author: Kyle Shannon <kyle at pobox dot com>
 */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -88,9 +89,9 @@ int main(int argc, char *argv[]) {
     fprintf(pout, "gps,");
     fprintf(pout, "anchor_x,anchor_y,anchor_z,");
     fprintf(pout, "target_x,target_y,target_z,");
-    fprintf(pout, "first_return_x,first_return_y,first_return_z,");
-    fprintf(pout, "last_return_x,last_return_y,last_return_z,");
     fprintf(pout, "raw_first_return,raw_last_return,");
+    fprintf(pout, "x_scale,y_scale,z_scale,");
+    fprintf(pout, "x_offset,y_offset,z_offset,");
     fprintf(pout, "edge,scan_dir,"); /* bit, written as uint8 */
     fprintf(pout, "facet,"); /* 2 bit, written as uint8 */
     fprintf(pout, "intensity\n"); /* uint8 */
@@ -99,8 +100,8 @@ int main(int argc, char *argv[]) {
                                  "%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
-                                 "%lf,%lf,%lf," \
                                  "%lf,%lf," \
+                                 "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%d,%d," \
                                  "%d," \
@@ -113,8 +114,11 @@ int main(int argc, char *argv[]) {
     wout = fopen(szWaveOut, "w");
 
     double gpsTime;
+    double toff, tscale;
     double xa, ya, za;
     double xt, yt, zt;
+    double xoff, yoff, zoff;
+    double xscale, yscale, zscale;
     double dx, dy, dz;
     double xf, yf, zf;
     double xl, yl, zl;
@@ -154,25 +158,36 @@ int main(int argc, char *argv[]) {
     printf("Using max count of %d for sample length\n", maxCount);
     printf("Total Points: %d\n", totalPoints);
     printf("Reported pulse count: %lld\n", pReader->p_count);
+    /* Scale and Offsets */
+    toff = pReader->header.t_offset;
+    xoff = pReader->header.x_offset;
+    yoff = pReader->header.y_offset;
+    zoff = pReader->header.z_offset;
+
+    tscale = pReader->header.t_scale_factor;
+    xscale = pReader->header.x_scale_factor;
+    yscale = pReader->header.y_scale_factor;
+    zscale = pReader->header.z_scale_factor;
+
     pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
-        gpsTime = pReader->pulse.T * pReader->header.t_scale_factor + pReader->header.t_offset;
-        xa = pReader->pulse.anchor_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        ya = pReader->pulse.anchor_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
-        za = pReader->pulse.anchor_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
-        xt = pReader->pulse.target_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        yt = pReader->pulse.target_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
-        zt = pReader->pulse.target_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
-        dx = (xt - xa) / 1000;
-        dy = (yt - ya) / 1000;
-        dz = (zt - za) / 1000;
-        xf = xa + pReader->pulse.first_returning_sample * dx;
-        yf = ya + pReader->pulse.first_returning_sample * dy;
-        zf = za + pReader->pulse.first_returning_sample * dz;
-        xl = xa + pReader->pulse.last_returning_sample * dx;
-        yl = ya + pReader->pulse.last_returning_sample * dy;
-        zl = za + pReader->pulse.last_returning_sample * dz;
+        gpsTime = (pReader->pulse.T * tscale) + toff;
+        xa = pReader->pulse.anchor_X;
+        ya = pReader->pulse.anchor_Y;
+        za = pReader->pulse.anchor_Z;
+        xt = pReader->pulse.target_X;
+        yt = pReader->pulse.target_Y;
+        zt = pReader->pulse.target_Z;
+        dx = (xt - xa) / 1000.0;
+        dy = (yt - ya) / 1000.0;
+        dz = (zt - za) / 1000.0;
+        xf = pReader->pulse.first_returning_sample;
+        yf = pReader->pulse.first_returning_sample;
+        zf = pReader->pulse.first_returning_sample;
+        xl = pReader->pulse.last_returning_sample;
+        yl = pReader->pulse.last_returning_sample;
+        zl = pReader->pulse.last_returning_sample;
         rf = pReader->pulse.first_returning_sample;
         rl = pReader->pulse.last_returning_sample;
 
@@ -183,9 +198,9 @@ int main(int argc, char *argv[]) {
                                           gpsTime,
                                           xa, ya, za,
                                           xt, yt, zt,
-                                          xf, yf, zf,
-                                          xl, yl, zl,
                                           rf, rl,
+                                          xscale, yscale, zscale,
+                                          xoff, yoff, zoff,
                                           edge, scan_dir,
                                           pReader->pulse.mirror_facet,
                                           intensity);
@@ -233,6 +248,7 @@ int main(int argc, char *argv[]) {
         } else {
             /* No data??? */
             printf("NO DATA!\n");
+            assert(0);
         }
         p++;
         if(p % 1000 == 0) {
