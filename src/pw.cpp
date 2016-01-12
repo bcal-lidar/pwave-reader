@@ -178,9 +178,9 @@ int main(int argc, char *argv[]) {
         xt = (pReader->pulse.target_X * xscale) + xoff;
         yt = (pReader->pulse.target_Y * yscale) + yoff;
         zt = (pReader->pulse.target_Z * zscale) + zoff;
-        dx = (xt - xa) / 1000;
-        dy = (yt - ya) / 1000;
-        dz = (zt - za) / 1000;
+        dx = (xt - xa) / 1000.0;
+        dy = (yt - ya) / 1000.0;
+        dz = (zt - za) / 1000.0;
         xf = xa + pReader->pulse.first_returning_sample * dx;
         yf = ya + pReader->pulse.first_returning_sample * dy;
         zf = za + pReader->pulse.first_returning_sample * dz;
