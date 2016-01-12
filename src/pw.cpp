@@ -182,12 +182,6 @@ int main(int argc, char *argv[]) {
         dx = (xt - xa) / 1000.0;
         dy = (yt - ya) / 1000.0;
         dz = (zt - za) / 1000.0;
-        xf = pReader->pulse.first_returning_sample;
-        yf = pReader->pulse.first_returning_sample;
-        zf = pReader->pulse.first_returning_sample;
-        xl = pReader->pulse.last_returning_sample;
-        yl = pReader->pulse.last_returning_sample;
-        zl = pReader->pulse.last_returning_sample;
         rf = pReader->pulse.first_returning_sample;
         rl = pReader->pulse.last_returning_sample;
 
