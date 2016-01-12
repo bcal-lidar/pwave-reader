@@ -118,6 +118,8 @@ int main(int argc, char *argv[]) {
     double dx, dy, dz;
     double xf, yf, zf;
     double xl, yl, zl;
+    double toff, xoff, yoff, zoff;
+    double tscale, xscale, yscale, zscale;
     double rf, rl;
     unsigned char edge;
     unsigned char scan_dir;
@@ -154,16 +156,28 @@ int main(int argc, char *argv[]) {
     printf("Using max count of %d for sample length\n", maxCount);
     printf("Total Points: %d\n", totalPoints);
     printf("Reported pulse count: %lld\n", pReader->p_count);
+
+    /* Scale and Offsets */
+    toff = pReader->header.t_offset;
+    xoff = pReader->header.x_offset;
+    yoff = pReader->header.y_offset;
+    zoff = pReader->header.z_offset;
+
+    tscale = pReader->header.t_scale_factor;
+    xscale = pReader->header.x_scale_factor;
+    yscale = pReader->header.y_scale_factor;
+    zscale = pReader->header.z_scale_factor;
+
     pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
-        gpsTime = pReader->pulse.T * pReader->header.t_scale_factor + pReader->header.t_offset;
-        xa = pReader->pulse.anchor_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        ya = pReader->pulse.anchor_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
-        za = pReader->pulse.anchor_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
-        xt = pReader->pulse.target_X * pReader->header.x_scale_factor + pReader->header.x_offset;
-        yt = pReader->pulse.target_Y * pReader->header.y_scale_factor + pReader->header.y_offset;
-        zt = pReader->pulse.target_Z * pReader->header.z_scale_factor + pReader->header.z_offset;
+        gpsTime = (pReader->pulse.T * tscale) + toff;
+        xa = (pReader->pulse.anchor_X * xscale) + xoff;
+        ya = (pReader->pulse.anchor_Y * yscale) + yoff;
+        za = (pReader->pulse.anchor_Z * zscale) + zoff;
+        xt = (pReader->pulse.target_X * xscale) + xoff;
+        yt = (pReader->pulse.target_Y * yscale) + yoff;
+        zt = (pReader->pulse.target_Z * zscale) + zoff;
         dx = (xt - xa) / 1000;
         dy = (yt - ya) / 1000;
         dz = (zt - za) / 1000;
