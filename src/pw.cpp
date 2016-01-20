@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
                 }
                 for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
                     if(maxCount < sampling->get_number_of_samples()) {
-                        maxCount = sampling->get_number_of_samples();
+                       maxCount = sampling->get_number_of_samples();
                     }
                 }
             }
@@ -157,20 +157,19 @@ int main(int argc, char *argv[]) {
         /* Write line to pulse file */
         gpsTime = pReader->pulse.get_T();
         pReader->pulse.compute_anchor_and_target_and_dir();
-        xa = pReader->pulse.compute_and_get_anchor_x();
-        ya = pReader->pulse.compute_and_get_anchor_y();
-        za = pReader->pulse.compute_and_get_anchor_z();
-        xt = pReader->pulse.compute_and_get_target_x();
-        yt = pReader->pulse.compute_and_get_target_y();
-        zt = pReader->pulse.compute_and_get_target_z();
-        pReader->pulse.compute_first();
-        xf = pReader->pulse.compute_and_get_first_x();
-        yf = pReader->pulse.compute_and_get_first_y();
-        zf = pReader->pulse.compute_and_get_first_z();
-        pReader->pulse.compute_last();
-        xl = pReader->pulse.compute_and_get_last_x();
-        yl = pReader->pulse.compute_and_get_last_y();
-        zl = pReader->pulse.compute_and_get_last_z();
+        xa = pReader->pulse.get_anchor_x();
+        ya = pReader->pulse.get_anchor_y();
+        za = pReader->pulse.get_anchor_z();
+        xt = pReader->pulse.get_target_x();
+        yt = pReader->pulse.get_target_y();
+        zt = pReader->pulse.get_target_z();
+        pReader->pulse.compute_first_and_last();
+        xf = pReader->pulse.get_first_x();
+        yf = pReader->pulse.get_first_y();
+        zf = pReader->pulse.get_first_z();
+        xl = pReader->pulse.get_last_x();
+        yl = pReader->pulse.get_last_y();
+        zl = pReader->pulse.get_last_z();
 
         edge = pReader->pulse.edge_of_scan_line;
         scan_dir = pReader->pulse.scan_direction;
