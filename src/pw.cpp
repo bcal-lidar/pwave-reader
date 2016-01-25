@@ -33,12 +33,13 @@ int main(int argc, char *argv[]) {
     int nwins = 1;
     FILE *scanout;
 
-    /* start with one incoming file */
-    wins = (FILE**)malloc(sizeof(FILE*) * nwins);
-
     if(argc < 3) {
         Usage();
     }
+
+    /* start with one incoming file */
+    wins = (FILE**)malloc(sizeof(FILE*) * nwins);
+
     pOpener.set_file_name(argv[1]);
     pReader = pOpener.open();
     if(pReader == 0)
