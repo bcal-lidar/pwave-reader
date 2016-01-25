@@ -10,8 +10,6 @@
 
 #include "pulsereader.hpp"
 
-#define MAX(a, b) (a)>(b)?(a):(b)
-
 /*
 ** This program opens and reads a pulse waves file, and outputs pertinent
 ** information for each in/out waveform.  The output should be consumable by
