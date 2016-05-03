@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     pReader->seek(0);
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
-        gpsTime = pReader->pulse.get_T();
+        gpsTime = pReader->pulse.get_t();
         pReader->pulse.compute_anchor_and_target_and_dir();
         xa = pReader->pulse.get_anchor_x();
         ya = pReader->pulse.get_anchor_y();
