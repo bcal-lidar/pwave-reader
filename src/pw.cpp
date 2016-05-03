@@ -152,6 +152,8 @@ int main(int argc, char *argv[]) {
     printf("Reported pulse count: %lld\n", pReader->p_count);
 
     pReader->seek(0);
+    int outCount = 0;
+    int outFound = 0;
     while(pReader->read_pulse()) {
         /* Write line to pulse file */
         gpsTime = pReader->pulse.get_t();
@@ -184,12 +186,19 @@ int main(int argc, char *argv[]) {
                                           intensity);
 
         if(pReader->read_waves()) {
+            outFound = false;
             returnCount = 0;
             for(i = 0; i < pReader->waves->get_number_of_samplings() && returnCount < 1; i++) {
                 sampling = pReader->waves->get_sampling(i);
                 if(sampling->get_type() == PULSEWAVES_OUTGOING) {
+                    if( outFound ) {
+                        printf("more that one outgoing sampling found");
+                        outFound++;
+                    }
+                    outFound = true;
                     fprintf(wout, "%lld ", p);
                     for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
+                        sampling->set_active_segment(j);
                         fi = 0;
                         for(k = 0; k < maxCount; k++) {
                             if(k >= sampling->get_number_of_samples()) {
@@ -202,6 +211,7 @@ int main(int argc, char *argv[]) {
                     fprintf(wout, "\n");
                 } else if(sampling->get_type() == PULSEWAVES_RETURNING) {
                     for(j = 0; j < sampling->get_number_of_segments(); j++ ) {
+                        sampling->set_active_segment(j);
                         /* Need new file? */
                         if(j >= nwins) {
                             wins = (FILE**)realloc(wins, sizeof(FILE*) * ++nwins);
@@ -250,6 +260,7 @@ int main(int argc, char *argv[]) {
     free(wins);
     printf("Created %d incoming wave files\n", nwins);
     printf("Total points processed: %lld\n", p);
+    printf("Multiple outgoing samplings: %d\n", outCount);
 
     return 0;
 }
