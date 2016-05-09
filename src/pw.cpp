@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
     fprintf(pout, "intensity\n"); /* uint8 */
 
     const char szPulseFormat[] = "%lld," \
-                                 "%lf," \
+                                 "%.8lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
                                  "%lf,%lf,%lf," \
